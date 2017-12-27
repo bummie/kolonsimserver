@@ -1,0 +1,25 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  $(function () 
+  {
+    var socket = io("http://localhost:3000/");
+    var player = 
+    { 21123: 
+      {
+        "kolonial" : {"name": "Seb", "yo": 123},
+        "pos": {"x" : 1, "y" : 2, "z" : 3},
+        "rotation" : {"x" : 1, "y" : 2, "z" : 3},
+        "item" : false
+      }
+    };
+    socket.emit('new_player', player);
+
+    socket.on('update_clients', function(data) 
+    {
+      console.log(data);
+    });
+
+  });
+</script>

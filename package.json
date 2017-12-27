@@ -1,0 +1,23 @@
+{
+  "name": "kolonsim_server",
+  "version": "1.0.0",
+  "description": "Server for kolonsim",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bummie/kolonsimserver.git"
+  },
+  "author": "Sebastian S. Berge",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bummie/kolonsimserver/issues"
+  },
+  "homepage": "https://github.com/bummie/kolonsimserver#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
+}
