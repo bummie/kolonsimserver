@@ -13,7 +13,8 @@ app.get('/', function(req, res)
 
 io.on('connection', function(socket)
 {
-  console.log('a user connected with id: ' + socket.id);
+    console.log('a user connected with id: ' + socket.id);
+    socket.emit("connection_response", socket.id);
 
     setInterval(() => 
     {
