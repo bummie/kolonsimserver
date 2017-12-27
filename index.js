@@ -2,6 +2,8 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+// Config
+var SERVER_UPDATE_INTERVAL = 1000;
 var players = [];
 
 app.get('/', function(req, res)
@@ -16,11 +18,11 @@ io.on('connection', function(socket)
     setInterval(() => 
     {
         io.sockets.emit('update_clients', players);
-    }, 1000)
+    }, SERVER_UPDATE_INTERVAL)
 
     socket.on('new_player', function(data)
     {
-        console.log('a user connected with id: ' + socket.id);
+        console.log('A player sent: ' + data);
         players.push(data);
     });
 
