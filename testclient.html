@@ -4,9 +4,12 @@
 <script>
   $(function () 
   {
+    //var socket = io("http://45.32.235.36:3000/");
     var socket = io("http://localhost:3000/");
+
     var playerdata = 
-    { "SocketId": 33, 
+    { "SocketId": 33,
+      "Ping" : 0,
       "Kolonial" : {},
       "Pos": {"x" : 1, "y" : 2, "z" : 3},
       "Rot" : {"x" : 1, "y" : 2, "z" : 3},
@@ -20,16 +23,41 @@
       $("#localplayer").html("Local: " + playerdata["SocketId"]);
     });
 
-    socket.on('update_clients', function(data) 
+    socket.on('update_clients_init', function(data) 
     {
-      console.log(data);
       $("#remoteplayers").html("Remote: ");
       for(let i = 0; i < data.length; i++)
       {
-        $("#remoteplayers").html($("#remoteplayers").html() + "<br><b>" + i + "</b>: " +  data[i]["SocketId"]);
+        $("#remoteplayers").html($("#remoteplayers").html() + "<br><br><b>" + i + "</b>: " +  data[i]["SocketId"] + "<br>" + JSON.stringify(data[i]["Pos"]) + "<br>" + JSON.stringify(data[i]["Rot"]) );
       }
-      
     });
+
+    socket.on('update_clients', function(data) 
+    {
+      $("#remoteplayers").html("Remote: ");
+      for(let i = 0; i < data.length; i++)
+      {
+        $("#remoteplayers").html($("#remoteplayers").html() + "<br><br><b>" + i + "</b>: " +  data[i]["Ping"] + "ms " + data[i]["SocketId"] + "<br>" + JSON.stringify(data[i]["Pos"]) + "<br>" + JSON.stringify(data[i]["Rot"]) );
+      }
+    });
+
+    setInterval(() => 
+    {
+        console.log("Sending data");
+        let newdata = 
+        { "SocketId": playerdata["SocketId"], 
+          "Pos": {"x" : Math.random(), "y" : 2, "z" : 3},
+          "Rot" : {"x" : Math.random(), "y" : 2, "z" : 3}
+        };
+        socket.emit('update_data', newdata);
+    }, 3000)
+
+    // Responds to ping request
+    socket.on('ping_latency', function() 
+    {
+      socket.emit('pong_latency');
+    });
+
 
   });
 </script>

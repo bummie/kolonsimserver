@@ -4,6 +4,8 @@ var io = require('socket.io')(http);
 
 // Config
 var SERVER_UPDATE_INTERVAL = 1000;
+var SERVER_PING_INTERVAL = 3000;
+var pingtime_start = 0;
 var players = [];
 
 app.get('/', function(req, res)
@@ -14,17 +16,41 @@ app.get('/', function(req, res)
 io.on('connection', function(socket)
 {
     console.log('a user connected with id: ' + socket.id);
+   
     socket.emit("connection_response", socket.id);
-
-    setInterval(() => 
-    {
-        io.sockets.emit('update_clients', players);
-    }, SERVER_UPDATE_INTERVAL)
-
     socket.on('new_player', function(data)
     {
-        console.log('A player sent: ' + data);
         players.push(data);
+        socket.emit("update_clients_init", players);
+    });
+
+    // Send updated data to all clients
+    setInterval(() => 
+    {
+        io.sockets.emit('update_clients', strippedPlayersData());
+    }, SERVER_UPDATE_INTERVAL)
+    
+    // Ping the clients to get latency
+    setInterval(() => 
+    {
+        pingtime_start = Date.now();
+        io.sockets.emit('ping_latency');
+    }, SERVER_PING_INTERVAL)
+
+    socket.on('pong_latency', function()
+    {
+        let latency = Date.now() - pingtime_start;
+        setPing(socket.id, latency);
+    });
+
+    socket.on('update_kolonial', function(data)
+    {
+        io.sockets.emit('update_kolonial', data);
+    });
+
+    socket.on('update_data', function(data)
+    {
+        updateData(data);
     });
 
     socket.on('disconnect', function () 
@@ -41,8 +67,9 @@ http.listen(3000, function()
   console.log('listening on *:3000');
 });
 
+/////////////////////
 // Helper functions
-
+///////////////////
 // Searches the players and returns the index of given socketid
 function findPlayerIndex(socketid)
 {
@@ -66,4 +93,41 @@ function deletePlayerAtIndex(index)
     if(index === undefined || index === null) {return null;}
     if(index < 0 || index >= players.length) {return null;}
     players.splice(index, 1);
+}
+
+// Updates the pos and rot data in players array
+function updateData(data)
+{
+    if(data === undefined || data === null) { console.log("Bad data received");return;}
+    //console.log(JSON.stringify(data));
+    let index = findPlayerIndex(data["SocketId"]);
+    if(index != null)
+    {
+        players[index]["Pos"] = data["Pos"];
+        players[index]["Rot"] = data["Rot"];
+    }
+}
+
+// Removes unnecesary data from playerarray
+function strippedPlayersData()
+{
+    let strippedData = players;
+    for(let i = 0; i < players.length; i++)
+    {
+        delete strippedData[i]["Kolonial"];
+        delete strippedData[i]["Item"];
+    }
+    return strippedData;
+}
+
+// Sets the ping for given socketid
+function setPing(socketid, latency)
+{
+    if(socketid === undefined || socketid === null) { console.log("Bad ping id received");return;}
+    let index  = findPlayerIndex(socketid);
+    
+    if(index != null)
+    {
+        players[index]["Ping"] = latency;
+    }
 }
