@@ -5,21 +5,39 @@
   $(function () 
   {
     var socket = io("http://localhost:3000/");
-    var player = 
-    { 21123: 
-      {
-        "kolonial" : {"name": "Seb", "yo": 123},
-        "pos": {"x" : 1, "y" : 2, "z" : 3},
-        "rotation" : {"x" : 1, "y" : 2, "z" : 3},
-        "item" : false
-      }
+    var playerdata = 
+    { "SocketId": 33, 
+      "Kolonial" : {},
+      "Pos": {"x" : 1, "y" : 2, "z" : 3},
+      "Rot" : {"x" : 1, "y" : 2, "z" : 3},
+      "Item" : false
     };
-    socket.emit('new_player', player);
+
+    socket.on('connection_response', function(data) 
+    {
+      playerdata["SocketId"] = data;
+      socket.emit('new_player', playerdata);
+      $("#localplayer").html("Local: " + playerdata["SocketId"]);
+    });
 
     socket.on('update_clients', function(data) 
     {
       console.log(data);
+      $("#remoteplayers").html("Remote: ");
+      for(let i = 0; i < data.length; i++)
+      {
+        $("#remoteplayers").html($("#remoteplayers").html() + "<br><b>" + i + "</b>: " +  data[i]["SocketId"]);
+      }
+      
     });
 
   });
 </script>
+
+<html>
+  <body>
+    <h1>Client</h1>
+    <div id="localplayer"></div>
+    <div id="remoteplayers"></div>
+  </body>
+</html>

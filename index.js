@@ -30,6 +30,9 @@ io.on('connection', function(socket)
     socket.on('disconnect', function () 
     {
         console.log('a user disconnected with id: ' + socket.id);
+        let index = findPlayerIndex(socket.id);
+        deletePlayerAtIndex(index);
+        io.sockets.emit('disconected_player', socket.id);
     });
 });
 
@@ -37,3 +40,30 @@ http.listen(3000, function()
 {
   console.log('listening on *:3000');
 });
+
+// Helper functions
+
+// Searches the players and returns the index of given socketid
+function findPlayerIndex(socketid)
+{
+    if(socketid === undefined || socketid === null) {return null;}
+    let indexResult = null;
+    for(let i = 0; i < players.length; i++)
+    {
+        if(players[i]["SocketId"] === socketid)
+        {
+            indexResult = i;
+            break;
+        }
+    }
+
+    return indexResult; 
+}
+
+// Deletes a player at given index from player array
+function deletePlayerAtIndex(index)
+{
+    if(index === undefined || index === null) {return null;}
+    if(index < 0 || index >= players.length) {return null;}
+    players.splice(index, 1);
+}
