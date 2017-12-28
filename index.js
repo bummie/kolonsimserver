@@ -3,7 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // Config
-var SERVER_UPDATE_INTERVAL = 1000;
+var SERVER_UPDATE_INTERVAL = 600;
 var SERVER_PING_INTERVAL = 3000;
 var pingtime_start = 0;
 var players = [];
@@ -18,10 +18,12 @@ io.on('connection', function(socket)
     console.log('a user connected with id: ' + socket.id);
    
     socket.emit("connection_response", socket.id);
-    socket.on('new_player', function(data)
+    socket.on('new_player', function(datain)
     {
+        let data  = JSON.parse(datain);
         players.push(data);
-        socket.emit("update_clients_init", players);
+        console.log(JSON.stringify(players));
+        socket.emit("update_clients_init", JSON.stringify(players));
     });
 
     // Send updated data to all clients
@@ -43,13 +45,14 @@ io.on('connection', function(socket)
         setPing(socket.id, latency);
     });
 
-    socket.on('update_kolonial', function(data)
+    socket.on('update_kolonial', function(datain)
     {
-        io.sockets.emit('update_kolonial', data);
+        io.sockets.emit('update_kolonial', datain);
     });
 
-    socket.on('update_data', function(data)
+    socket.on('update_data', function(datain)
     {
+        let data  = JSON.parse(datain);
         updateData(data);
     });
 
