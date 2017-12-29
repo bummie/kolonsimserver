@@ -3,7 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // Config
-var SERVER_UPDATE_INTERVAL = 600;
+var SERVER_UPDATE_INTERVAL = 330;
 var SERVER_PING_INTERVAL = 3000;
 var pingtime_start = 0;
 var players = [];
