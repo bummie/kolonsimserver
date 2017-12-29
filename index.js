@@ -10,7 +10,7 @@ var players = [];
 
 app.get('/', function(req, res)
 {
-  res.send("Yo dawgh");
+  res.send("<div id='serverinfo'>Info</div>");
 });
 
 io.on('connection', function(socket)
@@ -22,7 +22,8 @@ io.on('connection', function(socket)
     {
         let data  = JSON.parse(datain);
         players.push(data);
-        console.log(JSON.stringify(players));
+        console.log("NewPly: " + data["SocketId"] + " Amount: " + players.length);
+        //console.log(JSON.stringify(players));
         socket.emit("update_clients_init", JSON.stringify(players));
     });
 
@@ -120,6 +121,8 @@ function strippedPlayersData()
         delete strippedData[i]["Kolonial"];
         delete strippedData[i]["Item"];
     }
+    //console.log("Players: " + players.length + " Strip: " + strippedData.length);
+    //console.log("StrippedData: " + JSON.stringify(strippedData));
     return strippedData;
 }
 
