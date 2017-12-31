@@ -3,14 +3,14 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // Config
-var SERVER_UPDATE_INTERVAL = 330;
-var SERVER_PING_INTERVAL = 3000;
+var SERVER_UPDATE_INTERVAL = 100;
+var SERVER_PING_INTERVAL = 2000;
 var pingtime_start = 0;
 var players = [];
 
 app.get('/', function(req, res)
 {
-  res.send("<div id='serverinfo'>Info</div>");
+  res.send("<div id='serverinfo'>PlayerAmount: " + players.length + "<br>"+ JSON.stringify(players) +"</div>");
 });
 
 io.on('connection', function(socket)
